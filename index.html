@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Behavioral artifact for a DAO treasury governance study comparing token-weighted and square-root voting under whale concentration and Sybil splitting." />
+  <title>DAO Treasury Governance Lab</title>
+  <style>
+    :root {
+      --bg: #07111f;
+      --panel: #0d1b2d;
+      --panel2: #12243a;
+      --line: #263b56;
+      --text: #eef5ff;
+      --muted: #a8b8cc;
+      --accent: #71d7ff;
+      --accent2: #9b8cff;
+      --good: #79e6b3;
+      --warn: #ffd27a;
+      --bad: #ff9a9a;
+      --shadow: 0 18px 50px rgba(0,0,0,.28);
+      --radius: 22px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 15% 5%, rgba(113,215,255,.14), transparent 34rem),
+        radial-gradient(circle at 90% 12%, rgba(155,140,255,.12), transparent 30rem),
+        var(--bg);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.55;
+    }
+
+    button, select, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:disabled { cursor: not-allowed; opacity: .48; }
+
+    .page { width: min(1120px, calc(100% - 30px)); margin: 0 auto; padding: 34px 0 52px; }
+    .topbar {
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      margin-bottom: 26px;
+    }
+    .course { display: flex; align-items: center; gap: 12px; }
+    .course-mark {
+      width: 42px; height: 42px; border-radius: 13px;
+      display: grid; place-items: center; font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #07111f;
+      box-shadow: var(--shadow);
+    }
+    .course strong { display: block; font-size: .93rem; }
+    .course span { color: var(--muted); font-size: .78rem; }
+    .privacy {
+      border: 1px solid var(--line); background: rgba(13,27,45,.78); color: var(--muted);
+      padding: 8px 12px; border-radius: 999px; font-size: .78rem;
+    }
+
+    .hero {
+      display: grid; grid-template-columns: 1.3fr .7fr; gap: 22px; align-items: stretch;
+      margin-bottom: 18px;
+    }
+    .hero-main, .hero-side, .card {
+      border: 1px solid var(--line); border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(18,36,58,.96), rgba(13,27,45,.96));
+      box-shadow: var(--shadow);
+    }
+    .hero-main { padding: 34px; }
+    .eyebrow { color: var(--accent); font-weight: 800; text-transform: uppercase; letter-spacing: .12em; font-size: .74rem; margin: 0 0 8px; }
+    h1 { font-size: clamp(2.15rem, 5vw, 4.35rem); line-height: .98; letter-spacing: -.05em; margin: 0 0 18px; }
+    h1 span { color: var(--accent); }
+    .lede { color: #d8e5f5; font-size: 1.05rem; max-width: 730px; margin: 0; }
+    .hero-side { padding: 24px; display: flex; flex-direction: column; justify-content: space-between; }
+    .hero-side h2 { margin: 0 0 8px; font-size: 1.15rem; }
+    .hero-side p { margin: 0; color: var(--muted); font-size: .9rem; }
+    .status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+    .status-box { padding: 12px; border-radius: 14px; background: #0a1727; border: 1px solid var(--line); }
+    .status-box b { display: block; font-size: .78rem; color: var(--muted); margin-bottom: 2px; }
+    .status-box span { font-weight: 800; }
+
+    .evidence-banner {
+      margin: 18px 0; border: 1px solid rgba(255,210,122,.35); background: rgba(255,210,122,.07);
+      border-radius: 16px; padding: 14px 16px; color: #ffe6aa; font-size: .88rem;
+    }
+
+    .steps { display: grid; grid-template-columns: repeat(4,1fr); gap: 9px; margin: 18px 0; }
+    .step { border: 1px solid var(--line); border-radius: 14px; background: rgba(13,27,45,.84); padding: 11px 12px; color: var(--muted); }
+    .step b { display: block; color: inherit; font-size: .86rem; }
+    .step span { font-size: .72rem; }
+    .step.active { border-color: rgba(113,215,255,.55); color: var(--text); background: rgba(113,215,255,.08); }
+    .step.done { border-color: rgba(121,230,179,.28); color: var(--good); }
+
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .card { padding: 26px; margin-top: 16px; }
+    .card h2 { margin: 0 0 7px; font-size: 1.38rem; }
+    .card h3 { margin: 0 0 7px; font-size: 1rem; }
+    .muted { color: var(--muted); }
+    .small { font-size: .82rem; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; }
+    .info {
+      padding: 15px; border: 1px solid var(--line); border-radius: 16px; background: #0a1727;
+    }
+    .info b { display: block; margin-bottom: 3px; }
+    .metric { font-size: 1.25rem; font-weight: 850; letter-spacing: -.02em; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 7px; border-radius: 999px; padding: 6px 10px;
+      border: 1px solid var(--line); background: #0a1727; font-size: .78rem; color: var(--muted);
+    }
+
+    .rules { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 15px; }
+    .rule { padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: #0a1727; }
+    .rule strong { display: block; margin-bottom: 5px; }
+    code, .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+    code { color: #c9f3ff; }
+
+    .choice-group { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 12px; }
+    .choice-btn {
+      text-align: left; padding: 15px; min-height: 96px; border-radius: 16px;
+      border: 1px solid var(--line); background: #0a1727; color: var(--text); transition: .16s ease;
+    }
+    .choice-btn:hover, .choice-btn:focus-visible { border-color: var(--accent); transform: translateY(-1px); outline: none; }
+    .choice-btn.selected { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(113,215,255,.09); }
+    .choice-btn .big { font-weight: 850; font-size: 1.08rem; display: block; margin-bottom: 4px; }
+    .choice-btn .desc { color: var(--muted); font-size: .82rem; }
+
+    .primary, .secondary, .ghost {
+      border: 0; border-radius: 13px; padding: 11px 16px; font-weight: 800;
+    }
+    .primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #06101c; }
+    .secondary { background: #1b304c; color: var(--text); border: 1px solid var(--line); }
+    .ghost { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+
+    .condition-note { display: none; margin-top: 14px; padding: 14px 16px; border-radius: 15px; border: 1px solid rgba(255,210,122,.35); background: rgba(255,210,122,.07); color: #ffe6aa; }
+    .condition-note.show { display: block; }
+
+    .value-table, .score-table, .benchmark-table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+    .value-table th, .value-table td, .score-table th, .score-table td, .benchmark-table th, .benchmark-table td {
+      padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: left; font-size: .88rem;
+    }
+    th { color: #c7d5e7; font-weight: 800; }
+    td { color: #e8f0fa; }
+    .winner { color: var(--good); font-weight: 850; }
+    .loser { color: var(--muted); }
+
+    .round-head { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+    .round-tag { padding: 6px 10px; border-radius: 999px; background: rgba(113,215,255,.09); border: 1px solid rgba(113,215,255,.3); color: var(--accent); font-weight: 800; font-size: .78rem; }
+    .support-bars { margin-top: 12px; display: grid; gap: 9px; }
+    .bar-row { display: grid; grid-template-columns: 25px 1fr 72px; align-items: center; gap: 10px; }
+    .bar-track { height: 11px; border-radius: 999px; background: #07111f; overflow: hidden; border: 1px solid var(--line); }
+    .bar-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+    .bar-value { text-align: right; color: var(--muted); font-size: .8rem; }
+
+    .result-callout { margin-top: 16px; padding: 16px; border-radius: 16px; border: 1px solid rgba(121,230,179,.35); background: rgba(121,230,179,.07); }
+    .result-callout strong { color: var(--good); }
+
+    .comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 14px; }
+    .comparison-card { padding: 18px; border-radius: 17px; border: 1px solid var(--line); background: #0a1727; }
+    .comparison-card h3 { font-size: 1.15rem; }
+    .comparison-card .winner-name { font-size: 1.5rem; font-weight: 900; margin-top: 5px; }
+
+    fieldset { border: 0; padding: 0; margin: 18px 0 0; }
+    legend { font-weight: 850; margin-bottom: 9px; }
+    .radio-list { display: grid; gap: 8px; }
+    .radio-list label { display: flex; align-items: flex-start; gap: 9px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 13px; background: #0a1727; }
+    input[type="radio"] { margin-top: 4px; accent-color: var(--accent); }
+    input[type="range"] { width: 100%; accent-color: var(--accent); }
+    .range-labels { display: flex; justify-content: space-between; color: var(--muted); font-size: .75rem; }
+
+    .reflection { padding: 16px; border-radius: 16px; background: #091829; border: 1px solid var(--line); white-space: pre-wrap; }
+    .record { max-height: 260px; overflow: auto; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: #06101c; color: #cfe3f7; font-size: .76rem; }
+
+    .footer { margin-top: 28px; color: var(--muted); font-size: .78rem; text-align: center; }
+    .footer a { color: var(--accent); }
+
+    .hidden { display: none !important; }
+    .error { color: var(--bad); margin-top: 8px; font-size: .82rem; }
+
+    @media (max-width: 820px) {
+      .hero, .grid-2, .comparison-grid, .rules { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .steps { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .page { width: min(100% - 18px, 1120px); padding-top: 18px; }
+      .topbar { align-items: flex-start; flex-direction: column; }
+      .hero-main, .hero-side, .card { padding: 18px; border-radius: 17px; }
+      .choice-group { grid-template-columns: 1fr; }
+      .round-head { flex-direction: column; }
+      .status-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="topbar">
+      <div class="course">
+        <div class="course-mark">CE</div>
+        <div>
+          <strong>COMSCI/ECON 206 · PS2</strong>
+          <span>Behavioral-science artifact · Zhou Zimu</span>
+        </div>
+      </div>
+      <div class="privacy">Static HTML · browser-only · no server</div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-main">
+        <p class="eyebrow">DAO Treasury Governance Lab</p>
+        <h1>Who should control a <span>shared treasury?</span></h1>
+        <p class="lede">Explore how token-weighted voting (TWV) and square-root voting (SRV) change collective choice when one holder owns 60% of the tokens—and what happens when identity splitting becomes strategically available.</p>
+      </div>
+      <aside class="hero-side">
+        <div>
+          <h2>Research focus</h2>
+          <p><strong>Governing the DAO Treasury: Token-Weighted vs. Square-Root Voting under Whale Concentration and Sybil Attacks.</strong></p>
+        </div>
+        <div class="status-grid">
+          <div class="status-box"><b>Actors</b><span>8</span></div>
+          <div class="status-box"><b>Proposals</b><span>3</span></div>
+          <div class="status-box"><b>Whale stake</b><span>60%</span></div>
+          <div class="status-box"><b>Your role</b><span>Ordinary holder</span></div>
+        </div>
+      </aside>
+    </section>
+
+    <div class="evidence-banner"><strong>Evidence status:</strong> this Space structures self-play and peer-play reflection. It does not collect data on a server and does not establish a population-level behavioral effect. The numerical benchmark shown later comes from a separate synthetic simulation (seed 206), not from human participants.</div>
+
+    <nav class="steps" aria-label="Experiment progress">
+      <div class="step active" data-step="1"><b>1 · Understand</b><span>Rules & pre-choice</span></div>
+      <div class="step" data-step="2"><b>2 · Vote</b><span>Two governance rules</span></div>
+      <div class="step" data-step="3"><b>3 · Compare</b><span>Outcomes & benchmark</span></div>
+      <div class="step" data-step="4"><b>4 · Reflect</b><span>Fairness & Sybil choice</span></div>
+    </nav>
+
+    <section class="screen active" id="screen-1">
+      <div class="card">
+        <p class="eyebrow">Step 1 · Understand</p>
+        <h2>One treasury, three proposals, unequal token holdings.</h2>
+        <p class="muted">You are one of seven ordinary holders. Together the seven ordinary holders own 40% of the tokens; one whale owns the remaining 60%. Each actor votes for one proposal.</p>
+
+        <div class="rules">
+          <div class="rule">
+            <strong>Token-Weighted Voting (TWV)</strong>
+            <div class="mono">weight = token share</div>
+            <p class="muted small">A 60% holder receives voting weight 0.600. Each ordinary holder receives about 0.057.</p>
+          </div>
+          <div class="rule">
+            <strong>Square-Root Voting (SRV)</strong>
+            <div class="mono">weight = √(wallet token share)</div>
+            <p class="muted small">With one whale wallet, the whale receives about 0.775 while each ordinary holder receives about 0.239.</p>
+          </div>
+        </div>
+
+        <div class="condition-note" id="sybil-note">
+          <strong>Additional information for this session:</strong> under SRV, splitting the same 60% stake across multiple wallets can increase total effective voting weight. With 8 equal whale-controlled wallets, the total SRV weight becomes <span class="mono">√(8 × 0.60) ≈ 2.191</span>, compared with <span class="mono">√0.60 ≈ 0.775</span> for one wallet. The total stake has not changed.
+        </div>
+
+        <fieldset>
+          <legend>Before playing, which rule seems more appropriate for this DAO treasury?</legend>
+          <div class="radio-list" id="pre-pref">
+            <label><input type="radio" name="preference-pre" value="TWV"> TWV — token ownership should map directly into voting power.</label>
+            <label><input type="radio" name="preference-pre" value="SRV"> SRV — large token positions should face diminishing voting weight.</label>
+            <label><input type="radio" name="preference-pre" value="Unsure"> Unsure — I want to see the consequences first.</label>
+          </div>
+        </fieldset>
+        <div class="error hidden" id="pre-error">Choose one option before continuing.</div>
+        <div class="actions"><button class="primary" id="start-btn">Start the voting task</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-2">
+      <div class="card">
+        <div class="round-head">
+          <div>
+            <p class="eyebrow">Step 2 · Vote</p>
+            <h2 id="round-title">Round 1</h2>
+            <p class="muted" id="round-copy">Choose a proposal after seeing your own values and projected support from the other seven actors.</p>
+          </div>
+          <div class="round-tag" id="rule-tag">TWV</div>
+        </div>
+
+        <div class="grid-2" style="margin-top:15px">
+          <div class="info">
+            <h3>Your private values</h3>
+            <p class="muted small">Higher is better for you. Your highest-value proposal is the sincere-voting benchmark.</p>
+            <table class="value-table" aria-label="Your proposal values">
+              <thead><tr><th>Proposal</th><th>Value</th></tr></thead>
+              <tbody id="value-body"></tbody>
+            </table>
+          </div>
+          <div class="info">
+            <h3>Projected support before your vote</h3>
+            <p class="muted small">The other six ordinary holders split evenly between A and B; the whale supports C.</p>
+            <div class="support-bars" id="support-bars"></div>
+          </div>
+        </div>
+
+        <fieldset>
+          <legend>Which proposal do you vote for?</legend>
+          <div class="choice-group" id="proposal-choices">
+            <button class="choice-btn" data-proposal="A"><span class="big">Proposal A</span><span class="desc">Community infrastructure</span></button>
+            <button class="choice-btn" data-proposal="B"><span class="big">Proposal B</span><span class="desc">Contributor grants</span></button>
+            <button class="choice-btn" data-proposal="C"><span class="big">Proposal C</span><span class="desc">Liquidity expansion</span></button>
+          </div>
+        </fieldset>
+        <div class="error hidden" id="vote-error">Choose a proposal first.</div>
+
+        <div class="result-callout hidden" id="round-result"></div>
+        <div class="actions">
+          <button class="primary" id="lock-vote-btn">Lock vote & reveal outcome</button>
+          <button class="primary hidden" id="next-round-btn">Play the second rule</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-3">
+      <div class="card">
+        <p class="eyebrow">Step 3 · Compare</p>
+        <h2>Same treasury. Same actors. Different aggregation rules.</h2>
+        <p class="muted">The behavioral task holds the scenario fixed and changes the governance rule. Your votes may also change because the strategic environment changes.</p>
+        <div class="comparison-grid" id="comparison-grid"></div>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">Verified synthetic benchmark</p>
+        <h2>What the separate simulation found at 60% whale ownership.</h2>
+        <p class="muted">These are terminal-profile means from the project’s Python simulation: 1,000 synthetic valuation profiles per condition, seed 206. They are computational evidence, not human-participant results.</p>
+        <div style="overflow:auto">
+          <table class="benchmark-table">
+            <thead>
+              <tr><th>Rule</th><th>Whale wallets</th><th>Holder efficiency</th><th>Stake efficiency</th><th>Whale success</th><th>Non-whale representation</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>TWV</td><td>1</td><td>0.9057</td><td>0.9924</td><td>1.000</td><td>0.325</td></tr>
+              <tr><td>SRV</td><td>1</td><td>0.9370</td><td>0.9764</td><td>0.885</td><td>0.416</td></tr>
+              <tr><td>SRV</td><td>2</td><td>0.9271</td><td>0.9803</td><td>0.923</td><td>0.381</td></tr>
+              <tr><td>SRV</td><td>4</td><td>0.9065</td><td>0.9923</td><td>0.998</td><td>0.327</td></tr>
+              <tr><td>SRV</td><td>8</td><td>0.9057</td><td>0.9924</td><td>1.000</td><td>0.325</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="small muted">Interpretation: unsplit SRV raises equal-holder efficiency and non-whale representation in this simulation, while slightly lowering stake-weighted efficiency. As whale-controlled wallets increase, those gains disappear; at 8 wallets the displayed metrics match TWV. “Non-whale representation” here means the winning proposal maximizes the seven ordinary holders’ aggregate synthetic valuation; it is not a protected-minority measure or proof of real-world DAO capture.</p>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow">Allocation analogy boundary</p>
+        <h2>This is a collective allocation problem, not a literal auction.</h2>
+        <p class="muted">The scarce resource is DAO treasury funding and the proposals are competing uses of that resource. Token holdings shape decision power, but this behavioral demo has no monetary bids or payments. The project’s auction/allocation comparison should therefore be interpreted as a related allocation lens rather than as an identity between voting and auctions.</p>
+        <div class="actions"><button class="primary" id="to-reflect-btn">Continue to reflection</button></div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-4">
+      <div class="card">
+        <p class="eyebrow">Step 4 · Reflect</p>
+        <h2>What explains your choices?</h2>
+        <p class="muted">This stage distinguishes the rational benchmark from possible behavioral mechanisms such as fairness preferences, strategic voting, and bounded attention to Sybil incentives.</p>
+
+        <div class="grid-2">
+          <fieldset class="info">
+            <legend>How fair did TWV feel?</legend>
+            <input id="fair-twv" type="range" min="1" max="5" value="3" step="1" />
+            <div class="range-labels"><span>1 · very unfair</span><span>5 · very fair</span></div>
+          </fieldset>
+          <fieldset class="info">
+            <legend>How fair did SRV feel?</legend>
+            <input id="fair-srv" type="range" min="1" max="5" value="3" step="1" />
+            <div class="range-labels"><span>1 · very unfair</span><span>5 · very fair</span></div>
+          </fieldset>
+        </div>
+
+        <fieldset>
+          <legend>After seeing the outcomes and simulation evidence, which rule do you prefer?</legend>
+          <div class="radio-list">
+            <label><input type="radio" name="preference-post" value="TWV"> TWV</label>
+            <label><input type="radio" name="preference-post" value="SRV"> SRV</label>
+            <label><input type="radio" name="preference-post" value="Unsure"> Unsure</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>If you controlled the 60% whale position under SRV and wallet splitting were costless, would you split the stake across 8 wallets?</legend>
+          <div class="radio-list">
+            <label><input type="radio" name="split-intent" value="Yes"> Yes — I would use the extra voting power.</label>
+            <label><input type="radio" name="split-intent" value="No"> No — I would keep one identity even if splitting were profitable.</label>
+            <label><input type="radio" name="split-intent" value="Unsure"> Unsure.</label>
+          </div>
+        </fieldset>
+
+        <fieldset>
+          <legend>Which explanation best fits your decision?</legend>
+          <div class="radio-list">
+            <label><input type="radio" name="reason" value="Payoff-maximizing strategy"> Payoff-maximizing strategy</label>
+            <label><input type="radio" name="reason" value="Procedural fairness"> Procedural fairness / representation</label>
+            <label><input type="radio" name="reason" value="Anti-whale preference"> Preference to limit concentrated influence</label>
+            <label><input type="radio" name="reason" value="Rule simplicity"> Simplicity / transparency of the rule</label>
+            <label><input type="radio" name="reason" value="Strategic uncertainty"> Strategic uncertainty / bounded reasoning</label>
+            <label><input type="radio" name="reason" value="Other"> Other</label>
+          </div>
+        </fieldset>
+        <div class="error hidden" id="reflect-error">Complete the three multiple-choice questions before generating the record.</div>
+        <div class="actions"><button class="primary" id="finish-btn">Generate exploratory record</button></div>
+      </div>
+
+      <div class="card hidden" id="final-card">
+        <p class="eyebrow">Exploratory self-play / peer-play record</p>
+        <h2>One session is evidence of a choice—not evidence of a population effect.</h2>
+        <div class="reflection" id="reflection-text"></div>
+        <div class="actions">
+          <button class="secondary" id="copy-reflection-btn">Copy reflection sentence</button>
+          <button class="secondary" id="download-json-btn">Download JSON record</button>
+          <button class="ghost" id="restart-btn">Start a new session</button>
+        </div>
+        <h3 style="margin-top:22px">Machine-readable record</h3>
+        <pre class="record" id="json-record"></pre>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <p>Course instructor: Professor Luyao Zhang · COMSCI/ECON 206 Computational Microeconomics · Autumn 2026 Session 1</p>
+      <p id="artifact-links">GitHub and Colab links can be enabled by editing the two constants near the top of the script.</p>
+    </footer>
+  </main>
+
+  <script>
+    // Add the published artifact URLs here before final submission.
+    const GITHUB_URL = "";
+    const COLAB_URL = "";
+
+    const proposals = {
+      A: {name: "Proposal A", desc: "Community infrastructure"},
+      B: {name: "Proposal B", desc: "Contributor grants"},
+      C: {name: "Proposal C", desc: "Liquidity expansion"}
+    };
+
+    const valueScenarios = [
+      {id: "A-strong", values: {A: 92, B: 64, C: 18}},
+      {id: "B-strong", values: {A: 63, B: 93, C: 18}},
+      {id: "A-close", values: {A: 86, B: 79, C: 22}},
+      {id: "B-close", values: {A: 78, B: 87, C: 22}}
+    ];
+
+    const state = {
+      sessionId: makeId(),
+      condition: Math.random() < 0.5 ? "standard" : "sybil-salient",
+      ruleOrder: Math.random() < 0.5 ? ["TWV", "SRV"] : ["SRV", "TWV"],
+      valueScenario: valueScenarios[Math.floor(Math.random() * valueScenarios.length)],
+      prePreference: null,
+      roundIndex: 0,
+      selectedProposal: null,
+      rounds: [],
+      postPreference: null,
+      splitIntent: null,
+      reason: null,
+      fairTWV: 3,
+      fairSRV: 3
+    };
+
+    function makeId() {
+      if (window.crypto && crypto.getRandomValues) {
+        const a = new Uint32Array(2); crypto.getRandomValues(a);
+        return [...a].map(x => x.toString(16).padStart(8, "0")).join("");
+      }
+      return Math.random().toString(36).slice(2, 12);
+    }
+
+    function weight(rule, actor) {
+      const ordinaryStake = 0.4 / 7;
+      if (rule === "TWV") return actor === "whale" ? 0.6 : ordinaryStake;
+      return actor === "whale" ? Math.sqrt(0.6) : Math.sqrt(ordinaryStake);
+    }
+
+    function baseScores(rule) {
+      const ow = weight(rule, "ordinary");
+      const ww = weight(rule, "whale");
+      return {A: 3 * ow, B: 3 * ow, C: ww};
+    }
+
+    function outcome(rule, vote) {
+      const scores = baseScores(rule);
+      scores[vote] += weight(rule, "ordinary");
+      const order = ["A", "B", "C"];
+      let winner = order[0];
+      for (const p of order.slice(1)) {
+        if (scores[p] > scores[winner] + 1e-12) winner = p;
+      }
+      return {winner, scores};
+    }
+
+    function sincereChoice() {
+      const v = state.valueScenario.values;
+      return Object.keys(v).sort((a,b) => v[b] - v[a])[0];
+    }
+
+    function updateSteps(n) {
+      document.querySelectorAll(".step").forEach((el, i) => {
+        el.classList.toggle("active", i === n - 1);
+        el.classList.toggle("done", i < n - 1);
+      });
+    }
+
+    function showScreen(n) {
+      document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+      document.getElementById(`screen-${n}`).classList.add("active");
+      updateSteps(n);
+      window.scrollTo({top: 0, behavior: "smooth"});
+    }
+
+    function getRadio(name) {
+      const el = document.querySelector(`input[name="${name}"]:checked`);
+      return el ? el.value : null;
+    }
+
+    function renderCondition() {
+      document.getElementById("sybil-note").classList.toggle("show", state.condition === "sybil-salient");
+    }
+
+    function renderValues() {
+      const body = document.getElementById("value-body");
+      const values = state.valueScenario.values;
+      const top = sincereChoice();
+      body.innerHTML = ["A","B","C"].map(p => `<tr><td>${proposals[p].name}${p === top ? ' <span class="pill">highest value</span>' : ''}</td><td class="metric">${values[p]}</td></tr>`).join("");
+    }
+
+    function renderRound() {
+      state.selectedProposal = null;
+      document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("selected"));
+      document.getElementById("vote-error").classList.add("hidden");
+      document.getElementById("round-result").classList.add("hidden");
+      document.getElementById("lock-vote-btn").classList.remove("hidden");
+      document.getElementById("next-round-btn").classList.add("hidden");
+
+      const rule = state.ruleOrder[state.roundIndex];
+      document.getElementById("round-title").textContent = `Round ${state.roundIndex + 1}: ${rule}`;
+      document.getElementById("rule-tag").textContent = rule === "TWV" ? "Token-Weighted Voting" : "Square-Root Voting";
+      document.getElementById("round-copy").textContent = rule === "TWV"
+        ? "Your token share directly determines your voting weight."
+        : "Each wallet's voting weight is the square root of its token share; this round uses one whale wallet.";
+
+      renderValues();
+      const scores = baseScores(rule);
+      const max = Math.max(...Object.values(scores));
+      document.getElementById("support-bars").innerHTML = ["A","B","C"].map(p => `
+        <div class="bar-row">
+          <strong>${p}</strong>
+          <div class="bar-track"><div class="bar-fill" style="width:${Math.max(8, scores[p] / max * 100)}%"></div></div>
+          <div class="bar-value">${scores[p].toFixed(3)}</div>
+        </div>`).join("");
+    }
+
+    function lockVote() {
+      if (!state.selectedProposal) {
+        document.getElementById("vote-error").classList.remove("hidden");
+        return;
+      }
+      const rule = state.ruleOrder[state.roundIndex];
+      const result = outcome(rule, state.selectedProposal);
+      const sincere = sincereChoice();
+      const record = {
+        rule,
+        vote: state.selectedProposal,
+        sincereChoice: sincere,
+        matchedSincereBenchmark: state.selectedProposal === sincere,
+        winner: result.winner,
+        finalScores: Object.fromEntries(Object.entries(result.scores).map(([k,v]) => [k, Number(v.toFixed(6))]))
+      };
+      state.rounds.push(record);
+
+      const resultBox = document.getElementById("round-result");
+      resultBox.innerHTML = `<strong>${proposals[result.winner].name} wins under ${rule}.</strong><br>
+        You voted for ${proposals[state.selectedProposal].name}. Your highest-value proposal was ${proposals[sincere].name}; your vote ${record.matchedSincereBenchmark ? "matched" : "did not match"} the sincere-voting benchmark.<br>
+        <span class="small muted">Final weighted scores: A ${result.scores.A.toFixed(3)} · B ${result.scores.B.toFixed(3)} · C ${result.scores.C.toFixed(3)}</span>`;
+      resultBox.classList.remove("hidden");
+      document.getElementById("lock-vote-btn").classList.add("hidden");
+
+      if (state.roundIndex === 0) {
+        document.getElementById("next-round-btn").classList.remove("hidden");
+      } else {
+        setTimeout(() => { renderComparison(); showScreen(3); }, 350);
+      }
+    }
+
+    function renderComparison() {
+      const grid = document.getElementById("comparison-grid");
+      const order = ["TWV","SRV"];
+      grid.innerHTML = order.map(rule => {
+        const r = state.rounds.find(x => x.rule === rule);
+        return `<div class="comparison-card">
+          <span class="pill">${rule}</span>
+          <h3>${rule === "TWV" ? "Token ownership maps linearly into power" : "Large positions receive diminishing weight"}</h3>
+          <div class="winner-name">Winner: ${r.winner}</div>
+          <p class="muted small">Your vote: ${r.vote} · sincere choice: ${r.sincereChoice} · ${r.matchedSincereBenchmark ? "sincere benchmark matched" : "strategic/non-sincere choice"}</p>
+          <p class="small mono">A ${r.finalScores.A.toFixed(3)} · B ${r.finalScores.B.toFixed(3)} · C ${r.finalScores.C.toFixed(3)}</p>
+        </div>`;
+      }).join("");
+    }
+
+    function finish() {
+      state.postPreference = getRadio("preference-post");
+      state.splitIntent = getRadio("split-intent");
+      state.reason = getRadio("reason");
+      state.fairTWV = Number(document.getElementById("fair-twv").value);
+      state.fairSRV = Number(document.getElementById("fair-srv").value);
+      if (!state.postPreference || !state.splitIntent || !state.reason) {
+        document.getElementById("reflect-error").classList.remove("hidden");
+        return;
+      }
+      document.getElementById("reflect-error").classList.add("hidden");
+
+      const twv = state.rounds.find(x => x.rule === "TWV");
+      const srv = state.rounds.find(x => x.rule === "SRV");
+      const prefChange = state.prePreference === state.postPreference ? `remained ${state.postPreference}` : `changed from ${state.prePreference} to ${state.postPreference}`;
+      const splitPhrase = state.splitIntent === "Yes" ? "would split" : state.splitIntent === "No" ? "would not split" : "was unsure whether to split";
+      const sentence = `In this exploratory ${state.condition === "sybil-salient" ? "Sybil-salient" : "standard-information"} session, I voted ${twv.vote} under TWV and ${srv.vote} under SRV; the winners were ${twv.winner} and ${srv.winner}, respectively. My governance-rule preference ${prefChange} after seeing the comparison, and I ${splitPhrase} a 60% whale stake across eight wallets if splitting were costless. This is a self-play/peer-play observation, not population-level validation.`;
+      document.getElementById("reflection-text").textContent = sentence;
+
+      const record = exportRecord();
+      document.getElementById("json-record").textContent = JSON.stringify(record, null, 2);
+      document.getElementById("final-card").classList.remove("hidden");
+      document.getElementById("final-card").scrollIntoView({behavior:"smooth", block:"start"});
+    }
+
+    function exportRecord() {
+      return {
+        artifact: "DAO Treasury Governance Lab",
+        project: "Governing the DAO Treasury: Token-Weighted vs. Square-Root Voting under Whale Concentration and Sybil Attacks",
+        evidenceStatus: "exploratory self-play/peer-play; browser-only; not population-level validation",
+        sessionId: state.sessionId,
+        studyCondition: state.condition,
+        ruleOrder: state.ruleOrder,
+        scenario: {
+          whaleStake: 0.6,
+          ordinaryHolderStake: Number((0.4/7).toFixed(8)),
+          valueScenarioId: state.valueScenario.id,
+          userValues: state.valueScenario.values,
+          otherVotesBeforeUser: {A:3, B:3, C:"whale"}
+        },
+        preRulePreference: state.prePreference,
+        rounds: state.rounds,
+        fairnessRatings: {TWV: state.fairTWV, SRV: state.fairSRV},
+        postRulePreference: state.postPreference,
+        hypotheticalWhaleSplitIntent: state.splitIntent,
+        statedExplanation: state.reason,
+        computationalBenchmark: {
+          source: "separate synthetic Python simulation, seed 206, 1000 valuation profiles per condition",
+          c60: {
+            TWV_m1: {holderEfficiency:0.9057, stakeEfficiency:0.9924, whaleSuccess:1.000, nonwhaleRepresentation:0.325},
+            SRV_m1: {holderEfficiency:0.9370, stakeEfficiency:0.9764, whaleSuccess:0.885, nonwhaleRepresentation:0.416},
+            SRV_m8: {holderEfficiency:0.9057, stakeEfficiency:0.9924, whaleSuccess:1.000, nonwhaleRepresentation:0.325}
+          }
+        }
+      };
+    }
+
+    function downloadRecord() {
+      const blob = new Blob([JSON.stringify(exportRecord(), null, 2)], {type:"application/json"});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `dao_behavior_${state.sessionId}.json`;
+      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    async function copyReflection() {
+      const text = document.getElementById("reflection-text").textContent;
+      try { await navigator.clipboard.writeText(text); }
+      catch { const t = document.createElement("textarea"); t.value = text; document.body.appendChild(t); t.select(); document.execCommand("copy"); t.remove(); }
+      const btn = document.getElementById("copy-reflection-btn");
+      const old = btn.textContent; btn.textContent = "Copied"; setTimeout(() => btn.textContent = old, 1200);
+    }
+
+    document.querySelectorAll(".choice-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".choice-btn").forEach(b => b.classList.remove("selected"));
+        btn.classList.add("selected");
+        state.selectedProposal = btn.dataset.proposal;
+        document.getElementById("vote-error").classList.add("hidden");
+      });
+    });
+
+    document.getElementById("start-btn").addEventListener("click", () => {
+      state.prePreference = getRadio("preference-pre");
+      if (!state.prePreference) { document.getElementById("pre-error").classList.remove("hidden"); return; }
+      document.getElementById("pre-error").classList.add("hidden");
+      renderRound(); showScreen(2);
+    });
+
+    document.getElementById("lock-vote-btn").addEventListener("click", lockVote);
+    document.getElementById("next-round-btn").addEventListener("click", () => {
+      state.roundIndex = 1; renderRound();
+    });
+    document.getElementById("to-reflect-btn").addEventListener("click", () => showScreen(4));
+    document.getElementById("finish-btn").addEventListener("click", finish);
+    document.getElementById("copy-reflection-btn").addEventListener("click", copyReflection);
+    document.getElementById("download-json-btn").addEventListener("click", downloadRecord);
+    document.getElementById("restart-btn").addEventListener("click", () => window.location.reload());
+
+    if (GITHUB_URL || COLAB_URL) {
+      const links = [];
+      if (GITHUB_URL) links.push(`<a href="${GITHUB_URL}" target="_blank" rel="noopener">GitHub computation</a>`);
+      if (COLAB_URL) links.push(`<a href="${COLAB_URL}" target="_blank" rel="noopener">Runnable Colab</a>`);
+      document.getElementById("artifact-links").innerHTML = links.join(" · ");
+    }
+
+    renderCondition();
+  </script>
+</body>
+</html>
