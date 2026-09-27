@@ -28,13 +28,4 @@ Behavioral-science artifact for COMSCI/ECON 206 PS2.
 
 The Space is an exploratory behavioral artifact, not a population-level experiment. The displayed numerical benchmark is synthetic computational evidence from the accompanying Python simulation (seed 206, 1,000 valuation profiles per condition), not human-participant data.
 
-## Before final submission
 
-Open `index.html` and fill in these two constants near the top of the script once the artifacts are published:
-
-```js
-const GITHUB_URL = "";
-const COLAB_URL = "";
-```
-
-No Gradio, Python backend, tracking library, or external dependency is required.
