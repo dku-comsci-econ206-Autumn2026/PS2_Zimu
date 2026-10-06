@@ -1,0 +1,13 @@
+{
+  "seed": 206,
+  "profiles": 1000,
+  "total_actors": 8,
+  "ordinary_holders": 7,
+  "whale_holders": 1,
+  "whale_token_share": 0.60,
+  "ordinary_collective_share": 0.40,
+  "proposals": ["A", "B", "C"],
+  "sybil_wallets": 8,
+  "valuation_distribution": "independent uniform [0, 1) per actor and proposal",
+  "tie_break": "proposal order A, B, C"
+}

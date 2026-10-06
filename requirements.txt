@@ -1,0 +1,2 @@
+# The simulation and notebook use Python 3.10+ standard library only.
+# For a local Jupyter interface, install jupyter separately; Colab supplies it.

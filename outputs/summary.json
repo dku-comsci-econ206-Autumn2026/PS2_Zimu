@@ -1,0 +1,47 @@
+{
+  "model": "sincere plurality across three mutually exclusive treasury proposals",
+  "parameters": {
+    "seed": 206,
+    "profiles": 1000,
+    "total_actors": 8,
+    "ordinary_holders": 7,
+    "whale_holders": 1,
+    "whale_token_share": 0.6,
+    "ordinary_collective_share": 0.4,
+    "proposals": [
+      "A",
+      "B",
+      "C"
+    ],
+    "sybil_wallets": 8,
+    "valuation_distribution": "independent uniform [0, 1) per actor and proposal",
+    "tie_break": "proposal order A, B, C"
+  },
+  "metric_definitions": {
+    "holder_efficiency": "mean over profiles of winning total actor valuation / maximal total actor valuation",
+    "stake_efficiency": "mean over profiles of winning token-share-weighted valuation / maximal token-share-weighted valuation",
+    "whale_success": "fraction of profiles where winner is whale's top-valued proposal",
+    "nonwhale_representation": "fraction where winner maximizes seven ordinary holders' combined valuation"
+  },
+  "results": {
+    "TWV_m1": {
+      "holder_efficiency": 0.8990649793761742,
+      "stake_efficiency": 0.9910969671617406,
+      "whale_success": 1.0,
+      "nonwhale_representation": 0.321
+    },
+    "SRV_m1": {
+      "holder_efficiency": 0.9277806297233114,
+      "stake_efficiency": 0.9770755071787651,
+      "whale_success": 0.896,
+      "nonwhale_representation": 0.417
+    },
+    "SRV_m8": {
+      "holder_efficiency": 0.8990649793761742,
+      "stake_efficiency": 0.9910969671617406,
+      "whale_success": 1.0,
+      "nonwhale_representation": 0.321
+    }
+  },
+  "observation": "SRV with eight equal whale wallets yields whale voting power above all ordinary holders combined; TWV and split SRV choose the whale's sincere first choice on every paired profile."
+}

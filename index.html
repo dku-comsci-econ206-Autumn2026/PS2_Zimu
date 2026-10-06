@@ -331,22 +331,20 @@
       <div class="card">
         <p class="eyebrow">Verified synthetic benchmark</p>
         <h2>What the separate simulation found at 60% whale ownership.</h2>
-        <p class="muted">These are terminal-profile means from the project’s Python simulation: 1,000 synthetic valuation profiles per condition, seed 206. They are computational evidence, not human-participant results.</p>
+        <p class="muted">These are means from 1,000 paired synthetic valuation profiles per condition (independent uniform [0, 1), seed 206). They are computational evidence, not human-participant results.</p>
         <div style="overflow:auto">
           <table class="benchmark-table">
             <thead>
               <tr><th>Rule</th><th>Whale wallets</th><th>Holder efficiency</th><th>Stake efficiency</th><th>Whale success</th><th>Non-whale representation</th></tr>
             </thead>
             <tbody>
-              <tr><td>TWV</td><td>1</td><td>0.9057</td><td>0.9924</td><td>1.000</td><td>0.325</td></tr>
-              <tr><td>SRV</td><td>1</td><td>0.9370</td><td>0.9764</td><td>0.885</td><td>0.416</td></tr>
-              <tr><td>SRV</td><td>2</td><td>0.9271</td><td>0.9803</td><td>0.923</td><td>0.381</td></tr>
-              <tr><td>SRV</td><td>4</td><td>0.9065</td><td>0.9923</td><td>0.998</td><td>0.327</td></tr>
-              <tr><td>SRV</td><td>8</td><td>0.9057</td><td>0.9924</td><td>1.000</td><td>0.325</td></tr>
+              <tr><td>TWV</td><td>1</td><td>0.899065</td><td>0.991097</td><td>1.000</td><td>0.321</td></tr>
+              <tr><td>SRV</td><td>1</td><td>0.927781</td><td>0.977076</td><td>0.896</td><td>0.417</td></tr>
+              <tr><td>SRV</td><td>8</td><td>0.899065</td><td>0.991097</td><td>1.000</td><td>0.321</td></tr>
             </tbody>
           </table>
         </div>
-        <p class="small muted">Interpretation: unsplit SRV raises equal-holder efficiency and non-whale representation in this simulation, while slightly lowering stake-weighted efficiency. As whale-controlled wallets increase, those gains disappear; at 8 wallets the displayed metrics match TWV. “Non-whale representation” here means the winning proposal maximizes the seven ordinary holders’ aggregate synthetic valuation; it is not a protected-minority measure or proof of real-world DAO capture.</p>
+        <p class="small muted">Interpretation: unsplit SRV raises equal-holder efficiency and non-whale representation in this simulation, while slightly lowering stake-weighted efficiency. With 8 whale-controlled wallets, those gains disappear and the displayed metrics match TWV. “Non-whale representation” here means the winning proposal maximizes the seven ordinary holders’ aggregate synthetic valuation; it is not a protected-minority measure or proof of real-world DAO capture.</p>
       </div>
 
       <div class="card">
@@ -430,9 +428,9 @@
   </main>
 
   <script>
-    // Add the published artifact URLs here before final submission.
-    const GITHUB_URL = "";
-    const COLAB_URL = "";
+    // Computational artifact links.
+    const GITHUB_URL = "https://github.com/dku-comsci-econ206-Autumn2026/PS2_Zimu";
+    const COLAB_URL = "https://colab.research.google.com/github/dku-comsci-econ206-Autumn2026/PS2_Zimu/blob/main/dao_treasury_simulation.ipynb";
 
     const proposals = {
       A: {name: "Proposal A", desc: "Community infrastructure"},
@@ -649,11 +647,11 @@
         hypotheticalWhaleSplitIntent: state.splitIntent,
         statedExplanation: state.reason,
         computationalBenchmark: {
-          source: "separate synthetic Python simulation, seed 206, 1000 valuation profiles per condition",
+          source: "paired synthetic Python simulation, independent uniform [0,1) valuations, seed 206, 1000 profiles per condition",
           c60: {
-            TWV_m1: {holderEfficiency:0.9057, stakeEfficiency:0.9924, whaleSuccess:1.000, nonwhaleRepresentation:0.325},
-            SRV_m1: {holderEfficiency:0.9370, stakeEfficiency:0.9764, whaleSuccess:0.885, nonwhaleRepresentation:0.416},
-            SRV_m8: {holderEfficiency:0.9057, stakeEfficiency:0.9924, whaleSuccess:1.000, nonwhaleRepresentation:0.325}
+            TWV_m1: {holderEfficiency:0.899065, stakeEfficiency:0.991097, whaleSuccess:1.000, nonwhaleRepresentation:0.321},
+            SRV_m1: {holderEfficiency:0.927781, stakeEfficiency:0.977076, whaleSuccess:0.896, nonwhaleRepresentation:0.417},
+            SRV_m8: {holderEfficiency:0.899065, stakeEfficiency:0.991097, whaleSuccess:1.000, nonwhaleRepresentation:0.321}
           }
         }
       };

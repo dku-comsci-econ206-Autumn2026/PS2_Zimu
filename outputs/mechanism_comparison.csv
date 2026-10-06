@@ -1,0 +1,4 @@
+condition,rule,whale_wallets,profiles,holder_efficiency,stake_efficiency,whale_success,nonwhale_representation
+TWV_m1,TWV,1,1000,0.8990649793761742,0.9910969671617406,1.0,0.321
+SRV_m1,SRV,1,1000,0.9277806297233114,0.9770755071787651,0.896,0.417
+SRV_m8,SRV,8,1000,0.8990649793761742,0.9910969671617406,1.0,0.321
