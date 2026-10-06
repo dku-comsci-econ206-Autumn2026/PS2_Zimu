@@ -2,7 +2,7 @@
 
 ## Executed run
 
-From the repository root, `python -m src.simulation` wrote `outputs/simulation_results.csv`, `outputs/mechanism_comparison.csv`, and `outputs/summary.json`. The notebook was executed cell by cell in order using the Python standard library, and its recorded outputs were checked against the CLI. It can also be run with a standard notebook interface using **Run All** from the checkout root.
+From the repository root, `python -m src.simulation` wrote `outputs/simulation_results.csv`, `outputs/mechanism_comparison.csv`, and `outputs/summary.json`. The notebook was executed cell by cell in order using the Python standard library, and its recorded outputs were checked against the CLI. An additional isolated-directory Run All initialized the bundled source and inputs and produced all three outputs byte-identically. It can also be run with a standard notebook interface using **Run All** from the checkout root or standalone in Colab.
 
 The detail file has 3,000 data rows, 1,000 per condition. `profile_id` aligns the **same** valuation draws across all three conditions. The file includes outcomes, effective weights and per-profile contributions to each metric. The eight-by-three synthetic values regenerate exactly from the committed seed, generator, and source code; they are not duplicated in the CSV.
 

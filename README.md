@@ -39,14 +39,14 @@ python -m pip install -r requirements.txt
 python -m src.simulation
 ```
 
-The GitHub repository is private; Colab access to the linked notebook may require an authorized GitHub session. The notebook expects the complete checkout, including `src/` and `inputs/`, with the repository root as its working directory. Running an isolated notebook file without the repository files cannot import the simulation.
+The GitHub repository is private; opening its Colab link may require an authorized GitHub session. The notebook runs from a complete checkout using `src/` and `inputs/`. When opened alone in Colab, its first cell initializes an embedded copy of the **same** source and parameters in the notebook working directory. The subsequent cells execute and save the same outputs. The canonical editable source remains `src/simulation.py`.
 
 ## Exact run order and shortest reproducible run
 
 1. Clone or download the complete repository, enter `PS2_Zimu`, and check Python 3.10+.
 2. Run `python -m pip install -r requirements.txt` (no third-party dependencies).
 3. Run `python -m src.simulation` to regenerate all three outputs.
-4. Open `dao_treasury_simulation.ipynb` at the repository root and choose **Run All**. It reads the same inputs, reruns the model, saves the outputs, checks invariants and prints the comparison. The notebook has committed execution outputs for immediate inspection.
+4. Open `dao_treasury_simulation.ipynb` and choose **Run All**. It reads the same inputs (or initializes the bundled copy in an isolated Colab session), reruns the model, saves the outputs, checks invariants and prints the comparison. The notebook has committed execution outputs for immediate inspection.
 
 **Shortest reproducible run:** from the repository root, `python -m src.simulation`. No hosted service, Colab, or participant data is needed. Run the notebook after or instead of this command to see each calculation and its interpretation.
 
