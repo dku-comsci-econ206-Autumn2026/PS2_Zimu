@@ -1,3 +1,9 @@
+[![Current A0 research poster](poster/poster-preview.jpg)](poster/PS2-FP11-Zimu_Zhou-A0-Poster.pdf)
+
+**[View the current A0 poster (PDF)](poster/PS2-FP11-Zimu_Zhou-A0-Poster.pdf)** · **[Editable poster (PPTX)](poster/PS2-FP11-Zimu_Zhou-A0-Poster.pptx)** · **[Interactive Hugging Face demonstration](https://huggingface.co/spaces/dku-comsci-econ206-2026/DAO_Treasury)**
+
+> Poster snapshot: October 6, 2026. This is the currently available poster, not a claim that the October 14 feedback, new research-roadmap diagram, and final October 21 revisions have already been incorporated. The commit hash printed inside this historical poster dates to its original preparation.
+
 # Governing the DAO Treasury
 
 **Computational-science artifact for COMSCI/ECON 206 PS2.**  
@@ -39,7 +45,7 @@ python -m pip install -r requirements.txt
 python -m src.simulation
 ```
 
-The GitHub repository is private; opening its Colab link may require an authorized GitHub session. The notebook runs from a complete checkout using `src/` and `inputs/`. When opened alone in Colab, its first cell initializes an embedded copy of the **same** source and parameters in the notebook working directory. The subsequent cells execute and save the same outputs. The canonical editable source remains `src/simulation.py`.
+The GitHub repository is public. The notebook also provides a standalone Colab initialization cell. The notebook runs from a complete checkout using `src/` and `inputs/`. When opened alone in Colab, its first cell initializes an embedded copy of the **same** source and parameters in the notebook working directory. The subsequent cells execute and save the same outputs. The canonical editable source remains `src/simulation.py`.
 
 ## Exact run order and shortest reproducible run
 
@@ -82,3 +88,18 @@ The HF static interface asks a participant to make choices under two voting rule
 ## Limitations
 
 Results depend on independent uniform valuations, sincere voting, three alternatives, equal ordinary stakes, costless coordinated Sybil wallets, fixed 60% concentration, and the finite seed-206 sample. No strategic equilibrium, security or identity-verification mechanism, uncertainty interval, real DAO data, or causal behavioral effect is established. The older page numbers had no generating code or valuation specification in the two-file repository, so they cannot be reconstructed as a verified benchmark; see `VERIFICATION.md` for the numerical reconciliation.
+
+
+## Hugging Face and project links
+
+- **Behavioral demonstration:** https://huggingface.co/spaces/dku-comsci-econ206-2026/DAO_Treasury
+- **Computational repository:** https://github.com/dku-comsci-econ206-Autumn2026/PS2_Zimu
+- **Colab notebook:** https://colab.research.google.com/github/dku-comsci-econ206-Autumn2026/PS2_Zimu/blob/main/dao_treasury_simulation.ipynb
+- **Current A0 PDF:** [poster/PS2-FP11-Zimu_Zhou-A0-Poster.pdf](poster/PS2-FP11-Zimu_Zhou-A0-Poster.pdf)
+- **Editable A0 source:** [poster/PS2-FP11-Zimu_Zhou-A0-Poster.pptx](poster/PS2-FP11-Zimu_Zhou-A0-Poster.pptx)
+
+## October 14 research-development and October 21 final-submission tracking
+
+The dated source-of-truth for plans, completed work, evidence boundaries, and corrections is [RESEARCH_DEVELOPMENT.md](RESEARCH_DEVELOPMENT.md). The [feedback-response template](FEEDBACK_RESPONSE.md) separates actual received comments and verified changes from suggested future work; it deliberately does not invent partner findings, reviewers, award certificates, or tests. Before the final submission, synchronize the two-page paper, its appendices, the editable A0 poster, its PDF, this repository and the HF demonstration.
+
+**GitHub About → Website:** use `https://huggingface.co/spaces/dku-comsci-econ206-2026/DAO_Treasury`. This GitHub metadata field is not editable through the connected repository-file interface; set it in repository **About → Edit repository details → Website** and verify the resulting landing page.
